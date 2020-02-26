@@ -1,11 +1,12 @@
 import { Status } from './util/status';
 import { updateTasks } from './domNodes/createDomNodes';
-import { sortType, getSortedList } from './util/sortType';
+import { SortType, sortList } from './util/sortUtil';
+import { Color, getColor } from './util/colorUtil';
 
 const init = () => {
-  let toDoList = localStorage.getItem('toDoList') || [];
-  let completedList = localStorage.getItem('completedList') || [];
-  let currentSortType = sortType.ASC;
+  let toDoList = JSON.parse(localStorage.getItem('toDoList')) || [];
+  let completedList = JSON.parse(localStorage.getItem('completedList')) || [];
+  let currentSortType = SortType.ASC;
 
   const addTask = (e) => {
     e.preventDefault()
@@ -17,14 +18,17 @@ const init = () => {
       text: formData.get('inputText'),
       priority: formData.get('gridRadios'),
       date: date,
-      status: Status.NEW
+      status: Status.NEW,
+      color: getColor(formData.get('color').toUpperCase())
     };
     toDoList.push(toDoItem);
-    getSortedList(toDoList, currentSortType);
-    updateTasks(document.querySelector('#currentTasks'), toDoList);
+    sortList(toDoList, currentSortType);
+    updateTasks(currentTasksContainer, toDoList);
     currentTasksCount.textContent = toDoList.length;
     form.reset();
     document.querySelector('.close').click();
+
+    localStorage.setItem('toDoList', JSON.stringify(toDoList));
   }
 
   const handleItemAction = (e) => {
@@ -40,7 +44,18 @@ const init = () => {
           }
           actionButton.closest('li').remove();
           currentTasksCount.textContent = toDoList.length;
+
+          localStorage.setItem('toDoList', JSON.stringify(toDoList));
           break;
+        }
+        case 'edit': {
+          // const id = actionButton.dataset.id;
+          // const toDoItem = toDoList.find((listItem) => { listItem.id === Number(id) });
+          addTaskButton.style.display = 'none';
+          updateTaskButton.style.display = 'inline-block';
+          break;
+          // const formData = new FormData();
+          // Object.keys(toDoItem).forEach(key => formData.append(key, object[key]));
         }
         case 'complete': {
           const id = actionButton.dataset.id;
@@ -54,28 +69,61 @@ const init = () => {
 
           completedItem.status = Status.COMPLETED;
           completedList.push(completedItem);
-          getSortedList(completedList, currentSortType);
-          updateTasks(document.querySelector('#completedTasks'), completedList);
+          sortList(completedList, currentSortType);
+          updateTasks(completedTasksContainer, completedList);
           currentTasksCount.textContent = toDoList.length;
           completedTasksCount.textContent = completedList.length;
+
+          localStorage.setItem('toDoList', JSON.stringify(toDoList));
+          localStorage.setItem('completedList', JSON.stringify(completedList));
           break;
         }
       }
     }
   }
 
+  const sort = (sortType) => {
+    currentSortType = sortType;
+    sortList(completedList, sortType)
+    sortList(toDoList, sortType)
+    updateTasks(currentTasksContainer, toDoList);
+    updateTasks(completedTasksContainer, completedList);
+
+    localStorage.setItem('toDoList', toDoList);
+    localStorage.setItem('completedList', completedList);
+  }
+
+  const hideUpdateButton = () => {
+    addTaskButton.style.display = 'inline-block';
+    updateTaskButton.style.display = 'none';
+  }
+
   const initToDoList = () => {
-    document.querySelector('#currentTasksCount').textContent = completedList.length;
+    updateTasks(currentTasksContainer, toDoList);
+    updateTasks(completedTasksContainer, completedList);
+
+    document.querySelector('#currentTasksCount').textContent = toDoList.length;
     document.querySelector('#completedTasksCount').textContent = completedList.length;
   }
 
-  const form = document.querySelector('form');
+  const form = document.querySelector('#toDoForm');
   const currentTasksCount = document.querySelector('#currentTasksCount');
   const completedTasksCount = document.querySelector('#completedTasksCount');
+  const currentTasks = document.querySelector('#currentTasks');
+  const currentTasksContainer = document.querySelector('#currentTasks');
+  const completedTasksContainer = document.querySelector('#completedTasks');
+  const ascSort = document.querySelector('#ascSort');
+  const descSort = document.querySelector('#descSort');
+  const addTaskButton = document.querySelector('#addTaskButton');
+  const updateTaskButton = document.querySelector('#updateTaskButton');
+
 
   form.addEventListener('submit', addTask);
-  document.querySelector('#currentTasks').addEventListener('click', handleItemAction);
+  currentTasks.addEventListener('click', handleItemAction);
+  ascSort.addEventListener('click', () => sort(SortType.ASC));
+  descSort.addEventListener('click', () => sort(SortType.DESC));
+  document.querySelector('#addTaskButton').addEventListener('click', hideUpdateButton);
 
   initToDoList();
-};
+}
 document.addEventListener("DOMContentLoaded", init);
