@@ -1,7 +1,8 @@
 import {Status} from '../util/status';
 import {formatDate} from '../util/dateUtil';
+import {getClassByColorType} from './colorClassUtil';
 
-const createTaskInfo = ({title, text, priority, date}) => {
+const createTaskInfo = ({title, text, priority, date, color}) => {
   const taskInfoBlock = document.createElement('div');
   taskInfoBlock.classList.add('w-100', 'mr-2');
 
@@ -9,7 +10,7 @@ const createTaskInfo = ({title, text, priority, date}) => {
   taskInfoBlockContent.classList.add('d-flex', 'w-100', 'justify-content-between');
 
   const titleBlock = document.createElement('h5');
-  titleBlock.classList.add('mb-1');
+  titleBlock.classList.add(getClassByColorType(color), 'mb-1');
   titleBlock.textContent = title;
   taskInfoBlockContent.append(titleBlock)
 
@@ -20,7 +21,7 @@ const createTaskInfo = ({title, text, priority, date}) => {
   additionalInfo.append(priorityBlock);
 
   const dateBlock = document.createElement('small');
-  dateBlock.textContent = formatDate(date);
+  dateBlock.textContent = date instanceof Date ? formatDate(date) : formatDate(new Date(date));
   additionalInfo.append(dateBlock);
   taskInfoBlockContent.append(additionalInfo)
 
@@ -60,14 +61,16 @@ const createDropdownMenu = ({id}) => {
   completeButton.dataset.id = id;
 
   const editButton = document.createElement('button');
-  editButton.classList.add('btn', 'btn-info', 'w-100', 'my-2', 'edit');
+  editButton.classList.add('btn', 'btn-info', 'w-100', 'my-2');
   editButton.type = 'button';
   editButton.textContent = 'Edit';
   editButton.name = 'edit';
   editButton.dataset.id = id;
+  // editButton.dataset.toggle = 'modal';
+  // editButton.dataset.target = '#exampleModal';
 
   const deleteButton = document.createElement('button');
-  deleteButton.classList.add('btn', 'btn-danger', 'w-100', 'delete');
+  deleteButton.classList.add('btn', 'btn-danger', 'w-100');
   deleteButton.type = 'button';
   deleteButton.textContent = 'Delete';
   deleteButton.name = 'delete';
@@ -85,10 +88,12 @@ const createDropdownMenu = ({id}) => {
 export const updateTasks = (parent, toDoItemList) => {
   parent.textContent = '';
   for (let i = 0; i < toDoItemList.length; i++) {
+    const toDoItem = toDoItemList[i];
+
     const taskBlock = document.createElement('li');
     taskBlock.classList.add('list-group-item', 'd-flex', 'w-100', 'mb-2');
+    taskBlock.style.background = toDoItem.color;
   
-    const toDoItem = toDoItemList[i];
     taskBlock.append(createTaskInfo(toDoItem));
     if (toDoItem.status === Status.NEW) {
       taskBlock.append(createDropdownMenu(toDoItem));
