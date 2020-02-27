@@ -1,8 +1,10 @@
-import {Status} from '../util/status';
-import {formatDate} from '../util/dateUtil';
-import {getClassByColorType} from './colorClassUtil';
+import Status from '../util/status';
+import formatDate from '../util/dateUtil';
+import getClassByColorType from './colorClassUtil';
 
-const createTaskInfo = ({title, text, priority, date, color}) => {
+const createTaskInfo = ({
+  title, text, priority, date, color,
+}) => {
   const taskInfoBlock = document.createElement('div');
   taskInfoBlock.classList.add('w-100', 'mr-2');
 
@@ -12,7 +14,7 @@ const createTaskInfo = ({title, text, priority, date, color}) => {
   const titleBlock = document.createElement('h5');
   titleBlock.classList.add(getClassByColorType(color), 'mb-1');
   titleBlock.textContent = title;
-  taskInfoBlockContent.append(titleBlock)
+  taskInfoBlockContent.append(titleBlock);
 
   const additionalInfo = document.createElement('div');
   const priorityBlock = document.createElement('small');
@@ -23,7 +25,7 @@ const createTaskInfo = ({title, text, priority, date, color}) => {
   const dateBlock = document.createElement('small');
   dateBlock.textContent = date instanceof Date ? formatDate(date) : formatDate(new Date(date));
   additionalInfo.append(dateBlock);
-  taskInfoBlockContent.append(additionalInfo)
+  taskInfoBlockContent.append(additionalInfo);
 
   const taskInfoText = document.createElement('p');
   taskInfoText.textContent = text;
@@ -32,16 +34,16 @@ const createTaskInfo = ({title, text, priority, date, color}) => {
   taskInfoBlock.append(taskInfoBlockContent);
   taskInfoBlock.append(taskInfoText);
   return taskInfoBlock;
-}
+};
 
-const createDropdownMenu = ({id}) => {
+const createDropdownMenu = ({ id }) => {
   const dropdownBlock = document.createElement('div');
   dropdownBlock.classList.add('dropdown', 'm-2', 'dropleft');
 
   const dropdownButton = document.createElement('button');
   dropdownButton.classList.add('btn', 'btn-secondary', 'h-100');
   dropdownButton.type = 'button';
-  dropdownButton.dataset.toggle='dropdown';
+  dropdownButton.dataset.toggle = 'dropdown';
   dropdownButton.setAttribute('aria-haspopup', true);
   dropdownButton.setAttribute('aria-expanded', false);
 
@@ -66,8 +68,8 @@ const createDropdownMenu = ({id}) => {
   editButton.textContent = 'Edit';
   editButton.name = 'edit';
   editButton.dataset.id = id;
-  // editButton.dataset.toggle = 'modal';
-  // editButton.dataset.target = '#exampleModal';
+  editButton.dataset.toggle = 'modal';
+  editButton.dataset.target = '#exampleModal';
 
   const deleteButton = document.createElement('button');
   deleteButton.classList.add('btn', 'btn-danger', 'w-100');
@@ -83,21 +85,23 @@ const createDropdownMenu = ({id}) => {
   dropdownBlock.append(dropdownButton);
   dropdownBlock.append(actionButtons);
   return dropdownBlock;
-}
+};
 
-export const updateTasks = (parent, toDoItemList) => {
+const updateTasks = (parent, toDoItemList) => {
   parent.textContent = '';
-  for (let i = 0; i < toDoItemList.length; i++) {
+  for (let i = 0; i < toDoItemList.length; i += 1) {
     const toDoItem = toDoItemList[i];
 
     const taskBlock = document.createElement('li');
     taskBlock.classList.add('list-group-item', 'd-flex', 'w-100', 'mb-2');
     taskBlock.style.background = toDoItem.color;
-  
+
     taskBlock.append(createTaskInfo(toDoItem));
     if (toDoItem.status === Status.NEW) {
       taskBlock.append(createDropdownMenu(toDoItem));
     }
     parent.append(taskBlock);
   }
-}
+};
+
+export default updateTasks;
