@@ -1,5 +1,6 @@
 const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const glob = require("glob");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 let config = {
   entry: {
@@ -27,7 +28,15 @@ let config = {
         exclude: '/node_modules/'
       }
     ]
-  }
+  },
+  plugins: [
+    ...glob.sync("./*.html").map(htmlFile => {
+      return new HtmlWebpackPlugin({
+        filename: path.basename(htmlFile),
+        template: htmlFile
+      });
+    }),
+  ]
 };
 
 module.exports = (env, argv) => {
