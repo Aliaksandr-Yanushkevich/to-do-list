@@ -13,21 +13,21 @@ let config = {
   module: {
     rules: [
       {
+        enforce: 'pre',
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'eslint-loader',
+        options: {
+          fix: true,
+        }
+      },
+      {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: '/node_modules/'
-      },
-      {
-        test: /\.scss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
       }
     ]
-  },
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: '[name].css'
-    })
-  ]
+  }
 };
 
 module.exports = (env, argv) => {

@@ -1,7 +1,7 @@
-import {Color} from '../util/colorUtil';
+import { Color } from '../util/colorUtil';
 
-export const getClassByColorType = (colorType) => {
-  switch(colorType) {
+const getClassByColorType = (colorType) => {
+  switch (colorType) {
     case Color.BLUE: {
       return 'text-primary';
     }
@@ -17,5 +17,10 @@ export const getClassByColorType = (colorType) => {
     case Color.BLACK: {
       return 'text-dark';
     }
+    default: {
+      throw new Error('Color not found');
+    }
   }
-}
+};
+
+export default getClassByColorType;
